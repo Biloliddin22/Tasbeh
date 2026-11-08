@@ -818,6 +818,32 @@ h1 {
 .guide-steps li + li { margin-top: 8px; }
 .guide-steps li::marker { color: var(--accent); font-weight: 750; }
 
+.install-steps { max-width: 590px; }
+.install-steps li + li { margin-top: 18px; }
+
+.install-shot {
+  position: relative;
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.install-shot img { display: block; width: 100%; height: auto; }
+
+.install-shot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #c4192a;
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 2px white);
+}
+
 .menu-example {
   display: inline-grid;
   place-items: center;
@@ -856,7 +882,8 @@ h1 {
 .guide-demo:active { transform: scale(.98); }
 .guide-demo strong { font-size: 2.5rem; line-height: 1; }
 .guide-demo span { font-size: .9rem; }
-.guide-stats + .guide-note { margin-top: 9px; color: var(--muted); font-size: .9rem; }
+.guide-note { color: var(--muted); font-size: .9rem; }
+.guide-stats + .guide-note { margin-top: 9px; }
 
 .about-hero {
   display: grid;

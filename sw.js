@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "tasbeh-shell-";
 // Bump this version whenever a file in SHELL_FILES changes.
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const SHELL_FILES = [
   "./",
@@ -14,6 +14,9 @@ const SHELL_FILES = [
   "Tasbeh-512.png",
   "daily-chime.wav",
   "freestyle-chime.wav",
+  "install-guide/chrome-menu.webp",
+  "install-guide/install-option.webp",
+  "install-guide/confirm-install.webp",
 ];
 const scope = self.registration.scope;
 const indexAlias = new URL("index.html", scope).href;
@@ -24,8 +27,8 @@ self.addEventListener("install", event => {
     const cache = await caches.open(CACHE_NAME);
     // Cache the launch URL directly. Cloudflare Pages redirects the /index.html alias.
     await cache.addAll([...shellURLs].map(url => new Request(url, { cache: "reload", redirect: "error" })));
-    // This release must replace the broken v2 worker even if an error tab is still open.
-    if (CACHE_VERSION === 3) await self.skipWaiting();
+    // Replace the broken v2 worker even if a recovery tab is still open.
+    if (await caches.has(CACHE_PREFIX + "2")) await self.skipWaiting();
   })());
 });
 
