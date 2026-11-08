@@ -1,8 +1,9 @@
 const CACHE_PREFIX = "tasbeh-shell-";
 // Bump this version whenever a file in SHELL_FILES changes.
-const CACHE_NAME = CACHE_PREFIX + "2";
+const CACHE_VERSION = 3;
+const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const SHELL_FILES = [
-  "index.html",
+  "./",
   "style.css",
   "zikr.js",
   "translations.js",
@@ -15,19 +16,21 @@ const SHELL_FILES = [
   "freestyle-chime.wav",
 ];
 const scope = self.registration.scope;
-const entry = new URL("index.html", scope).href;
+const indexAlias = new URL("index.html", scope).href;
 const shellURLs = new Set(SHELL_FILES.map(file => new URL(file, scope).href));
 
 self.addEventListener("install", event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll([...shellURLs].map(url => new Request(url, { cache: "reload" })));
+    // Cache the launch URL directly. Cloudflare Pages redirects the /index.html alias.
+    await cache.addAll([...shellURLs].map(url => new Request(url, { cache: "reload", redirect: "error" })));
+    // This release must replace the broken v2 worker even if an error tab is still open.
+    if (CACHE_VERSION === 3) await self.skipWaiting();
   })());
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
-    // A new shell takes over when the previous app windows close.
     const oldCaches = (await caches.keys()).filter(name => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME);
     await Promise.all(oldCaches.map(name => caches.delete(name)));
     await self.clients.claim();
@@ -40,17 +43,20 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(request.url);
   url.search = "";
-  const key = request.mode === "navigate" && (url.href === scope || url.href === entry)
-    ? entry : url.href;
+  const key = request.mode === "navigate" && url.href === indexAlias ? scope : url.href;
   if (!shellURLs.has(key)) return;
 
   event.respondWith(serveShell(request, key));
 });
 
 async function serveShell(request, key) {
-  const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(key);
-  if (!cached) return fetch(request);
+  let cached;
+  try {
+    cached = await caches.match(key, { cacheName: CACHE_NAME });
+  } catch {
+    return fetch(request);
+  }
+  if (!cached || cached.redirected) return fetch(request);
 
   const range = request.headers.get("range");
   return range && key.endsWith(".wav") ? audioRange(cached, range) : cached;

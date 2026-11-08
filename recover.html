@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tasbeh</title>
+  <style>
+    :root { color: #263916; background: #fefce8; font: 1rem/1.5 system-ui, sans-serif; }
+    :root[data-theme="dark"] { color-scheme: dark; color: #e6f0df; background: #15231a; }
+    body { margin: 0; min-height: 100dvh; display: grid; place-items: center; }
+    main { width: min(calc(100% - 32px), 420px); text-align: center; }
+    h1 { margin: 0; }
+    button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #147a41; color: white; font: inherit; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tasbeh</h1>
+    <p id="status" role="status"></p>
+    <button id="retry" type="button" hidden></button>
+  </main>
+  <script>
+    const messages = {
+      en: ["Updating the offline files…", "Could not update Tasbeh. Check your internet connection and try again.", "Try again"],
+      ru: ["Обновляем файлы для работы офлайн…", "Не удалось обновить Tasbeh. Проверьте интернет и попробуйте снова.", "Повторить"],
+      uz: ["Oflayn ishlash uchun fayllar yangilanmoqda…", "Tasbehni yangilab bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.", "Qayta urinish"],
+    };
+    let preferences;
+    try {
+      preferences = JSON.parse(localStorage.getItem("tasbeh.prefs"));
+    } catch {
+      // Recovery also works without saved preferences.
+    }
+    const language = [preferences?.language, navigator.language.slice(0, 2)].find(code => Object.hasOwn(messages, code)) ?? "en";
+    document.documentElement.lang = language;
+    if (preferences?.theme === "dark") document.documentElement.dataset.theme = "dark";
+
+    const [updating, failed, tryAgain] = messages[language];
+    const status = document.getElementById("status");
+    const retry = document.getElementById("retry");
+    retry.textContent = tryAgain;
+    retry.addEventListener("click", recover);
+
+    async function recover() {
+      status.textContent = updating;
+      retry.hidden = true;
+      try {
+        const registration = await navigator.serviceWorker.register("./sw.js");
+        if (registration.active) await registration.update();
+
+        // The old worker ignores this page, so it can repair the main route in place.
+        const deadline = Date.now() + 15000;
+        while (Date.now() < deadline) {
+          const home = await caches.match(registration.scope);
+          if (home?.ok && !home.redirected && registration.active?.state === "activated" && !registration.installing) {
+            location.replace(registration.scope);
+            return;
+          }
+          await new Promise(resolve => setTimeout(resolve, 250));
+        }
+      } catch (error) {
+        console.warn("Tasbeh recovery failed", error);
+      }
+      status.textContent = failed;
+      retry.hidden = false;
+    }
+
+    recover();
+  </script>
+</body>
+</html>

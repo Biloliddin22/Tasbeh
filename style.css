@@ -920,6 +920,15 @@ h1 {
 
 @media (max-width: 630px) {
   .guide-grid { grid-template-columns: 1fr; }
+
+  #counter { padding-inline: clamp(16px, 6vw, 28px); }
+  #count { font-size: clamp(4.25rem, 20vw, 5.5rem); }
+  .counter-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: clamp(1.2rem, 5.2vw, 1.45rem);
+    font-weight: 600;
+  }
 }
 
 @media (max-width: 360px) {
