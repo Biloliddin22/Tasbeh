@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.45, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="Tasbeh.ico">
+  <link rel="manifest" href="manifest.json">
+  <title>Tasbeh</title>
+</head>
+<body>
+    
+    <div class="container"> 
+        <div id="zikrText"></div>
+        <div class="row">
+            <select id="zikrSelect"></select>
+
+            <select id="limitSelect">
+                <option value="11">11</option>
+                <option value="33">33</option>
+                <option value="99">99</option>
+                <option value="1000">1000</option>
+            </select>
+        </div>
+
+        <div id="counter" class="pulse" >
+            0 / 33
+        </div>
+
+        <div class="cycles">
+            Cycles: <span id="cycles">0</span>
+        </div>
+
+        <button id="reset">Reset</button>
+    </div>
+
+<style>
+        /* Сброс */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Центрируем всё */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        /* background:  #0ea5e9; синий*/
+        background: #fefce8;
+        color: #365314;
+    }
+
+    /* Контейнер */
+    .container {
+        width: 90%;
+        max-width: 800px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        margin: auto;
+    }
+
+    /* Выпадающие списки */
+    select {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 10px;
+        border: none;
+        font-size: 16px;
+        background: #ecfccb;
+        color: #365314;
+        width: 100%;
+        padding: 1.5em;       /* увеличен padding */
+        font-size: 1.2em;     /* масштаб шрифта */
+        border-radius: 40px;
+        border: none;
+        text-align: center;
+    }
+
+    #zikrText {
+        width: 100%;
+        padding: 1em;
+        font-size: 1.2rem;
+        line-height: 1.5;
+        text-align: center;
+        background: #ecfeff;
+        color: #064e3b;
+        border: 2px solid #073c57;
+        border-radius: 60px;
+        word-wrap: break-word;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .row {
+        display: flex;
+        gap: 10px; /* расстояние между ними */
+    }
+
+    .row select {
+        flex: 1; /* оба занимают равную ширину */
+    }
+
+    /* Большая кнопка (счётчик) */
+    #counter {
+        margin-top: 20px;
+        background: #84cc16;
+        color: #1a2e05;
+        box-shadow: 5px 5px 15px #073c57,
+                -5px -5px 15px #073c57;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+        will-change: transform;
+        width: 100%;
+        padding: 3em 1em;      /* адаптивное увеличение */
+        font-size: 2.5em;      /* крупный текст */
+        border-radius: 25px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        outline: none;
+
+        /* Основной вид */
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    /* эффект нажатия */
+    #counter:active {
+        transform: scale(0.98);
+        box-shadow: inset 2px 2px 6px rgba(0,0,0,0.2);
+    }
+
+    #counter.pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+
+    /* Для фокуса (убираем синюю рамку полностью) */
+    #counter:focus {
+        outline: none;
+    }
+
+    /* Второй счётчик */
+    .cycles {
+        margin-top: 15px;
+        font-size: 1.2em;
+        opacity: 0.8;
+    }
+
+    div.cycles {
+        margin-top: 15px;
+    }
+
+    /* Кнопка reset */
+    button {
+        margin-top: 20px;
+        padding: 1.2em 2em;
+        border: none;
+        border-radius: 15px;
+        background: #ef4444;
+        color: white;
+        font-size: 1.2em;
+        cursor: pointer;
+    }
+
+    .fade-out {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    .fade-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Универсальная адаптация под любой экран */
+    @media (max-width: 1300px) {
+        #counter {
+            font-size: 6em;
+            font-weight: bold;
+            padding: 50px;
+            border-radius: 105px;
+        }
+
+        #zikrText {
+            margin-bottom: 250px;
+            font-size: 4rem;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .cycles {
+            font-size: 4em;
+        }
+
+        .row {
+            margin-bottom: 60px;
+        }
+
+        select, button {
+            font-size: 4em;
+            padding: 2rem;
+            border: none;
+        }
+        select {
+            display: inline-block;
+            width: 50%;
+        }
+    }
+    @media (min-width: 1500px) {
+        #counter {
+            width: 100%;
+            height: 210px;
+            padding: 1em 1em;
+            font-size: 4.5em;
+            border-radius: 105px;
+        
+        }
+    }
+</style>
+<script >
+  
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+
+    let state = {
+        count: 0,
+        limit: 33,
+        cycles: 0,
+        index: 0
+    };
+
+    // === Загрузка состояния ===
+    function loadState() {
+        const saved = localStorage.getItem("tasbeh");
+        if (saved) {
+            state = JSON.parse(saved);
+        }
+    }
+
+    // === Сохранение ===
+    function saveState() {
+        localStorage.setItem("tasbeh", JSON.stringify(state));
+    }
+
+    // === Звук перехода ===
+    function playClick(frequency = 800, duration = 50) {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+
+        oscillator.frequency.value = frequency;
+        oscillator.type = "sine";
+
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
+
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + duration / 1000);
+    }
+
+    // === UI ===
+    const zikrSelect = document.getElementById("zikrSelect");
+    const limitSelect = document.getElementById("limitSelect");
+    const counter = document.getElementById("counter");
+    const cyclesEl = document.getElementById("cycles");
+    const zikrText = document.getElementById("zikrText");
+    const zikrList = [
+        { text: "Allohu Akbar" },
+        { text: "Alhamdulillah" },
+        { text: "Astag'firulloh" },
+        { text: "SubhanAllah" },
+        { text: "La ilaha illalloh" },
+        { text: "Subhanallohi va bihamdihi subhanallohil aziym" },
+        { text: "Astag'firullohil azim va atubu ilayh" },
+        { text: "Allohumma solli a'la sayyidina Muhammad" },
+        { text: "Solollohu alayka ya rasululloh" },
+        { text: "Laa ilaha illallohu Muhammadur rasululloh" },
+        { text: "Laa havla va laa quvvata illa billah" },
+        { text: "1. Ya Alloh" },
+        { text: "2. ar-Rohman" },
+        { text: "3. ar-Rohiym" },
+        { text: "4. al-Molik" },
+        { text: "5. al-Quddus" },
+        { text: "6. as-Salom" },
+        { text: "7. al-Mu'min" },
+        { text: "8. al-Muhaymin" },
+        { text: "9. al-Aziyz" },
+        { text: "10. al-Jabbor" },
+        { text: "11. al-Mutakabbir" },
+        { text: "12. al-Xoliq" },
+        { text: "13. al-Bori'" },
+        { text: "14. al-Musavvir" },
+        { text: "15. al-G'affor" },
+        { text: "16. al-Qahhor" },
+        { text: "17. al-Vahhob" },
+        { text: "18. ar-Razzoq" },
+        { text: "19. al-Fattoh" },
+        { text: "20. al-Aliym" },
+        { text: "21. al-Qobiz" },
+        { text: "22. al-Bosit" },
+        { text: "23. al-Xofiz" },
+        { text: "24. ar-Rofi'" },
+        { text: "25. al-Mu'izz" },
+        { text: "26. al-Muzill" },
+        { text: "27. as-Samiy'" },
+        { text: "28. al-Basiyr" },
+        { text: "29. al-Hakam" },
+        { text: "30. al-Adl" },
+        { text: "31. al-Latiyf" },
+        { text: "32. al-Xabiyr" },
+        { text: "33. al-Haliym" },
+        { text: "34. al-Aziym" },
+        { text: "35. al-G'afur" },
+        { text: "36. ash-Shakur" },
+        { text: "37. al-Aliy" },
+        { text: "38. al-Kabiyr" },
+        { text: "39. al-Hafiyz" },
+        { text: "40. al-Muqiyt" },
+        { text: "41. al-Hasiyb" },
+        { text: "42. al-Jaliyl" },
+        { text: "43. al-Kariym" },
+        { text: "44. al-Raqiyb" },
+        { text: "45. al-Mujiyb" },
+        { text: "46. al-Vosi'" },
+        { text: "47. al-Hakyim" },
+        { text: "48. al-Vadud" },
+        { text: "49. al-Majiyd" },
+        { text: "50. al-Bo'is" },
+        { text: "51. ash-Shadiyd" },
+        { text: "52. al-Haqq" },
+        { text: "53. al-Vakiyl" },
+        { text: "54. al-Qoviyy" },
+        { text: "55. al-Matiyn" },
+        { text: "56. al-Valiyy" },
+        { text: "57. al-Hamiyd" },
+        { text: "58. al-Muhsiy" },
+        { text: "59. al-Mubdi'" },
+        { text: "60. al-Mu'iyd" },
+        { text: "61. al-Muhyi" },
+        { text: "62. al-Mumiyt" },
+        { text: "63. al-Hayy" },
+        { text: "64. al-Qoyyum" },
+        { text: "65. al-Vojid" },
+        { text: "66. al-Mojid" },
+        { text: "67. al-Vojid (al-Ahad)" },
+        { text: "68. as-Somad" },
+        { text: "69. al-Qodir" },
+        { text: "70. al-Muqtadir" },
+        { text: "71. al-Muqaddim" },
+        { text: "72. al-Muaxxir" },
+        { text: "73. al-Avval" },
+        { text: "74. al-Oxir" },
+        { text: "75. az-Zohir" },
+        { text: "76. al-Botin" },
+        { text: "77. al-Voliy" },
+        { text: "78. al-Mutaoliy" },
+        { text: "79. al-Barr" },
+        { text: "80. at-Tavvob" },
+        { text: "81. al-Muntaqim" },
+        { text: "82. al-Afuvv" },
+        { text: "83. ar-Ra'uf" },
+        { text: "84. Molikul Mulk" },
+        { text: "85. Zul Zaloli val Ikrom" },
+        { text: "86. al-Muqsit" },
+        { text: "87. al-Jome'" },
+        { text: "88. al-G'aniyy" },
+        { text: "89. al-Mug'niy" },
+        { text: "90. al-Mone'" },
+        { text: "91. Az-Zorr" },
+        { text: "92. an-Nofi'" },
+        { text: "93. an-Nur" },
+        { text: "94. al-Hodiy" },
+        { text: "95. al-Badiy'" },
+        { text: "96. al-Boqiy" },
+        { text: "97. al-Voris" },
+        { text: "98. ar-Rashiyd" },
+        { text: "99. as-Sabur" }
+    ];
+
+    // Заполняем список
+    zikrList.forEach((z, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = z.text;
+        zikrSelect.appendChild(opt);
+    });
+
+    // Обновление UI
+    function updateUI() {
+        zikrSelect.value = state.index;
+        limitSelect.value = state.limit;
+        counter.textContent = `${state.count} / ${state.limit}`;
+        cyclesEl.textContent = state.cycles;
+        zikrText.textContent = zikrList[state.index].full || zikrList[state.index].text;
+        if (state.count === 0) {
+                counter.classList.add("pulse");
+            } else {
+                counter.classList.remove("pulse");
+            }
+    }
+
+    // Обновление анимации большого счётчика
+    function updateZikrTextAnimated() {
+        const el = document.getElementById("zikrText");
+
+        // исчезает
+        el.classList.add("fade-out");
+
+        setTimeout(() => {
+            // меняем текст
+            el.textContent = zikrList[state.index].full || zikrList[state.index].text;
+
+            // убираем fade-out, добавляем fade-in
+            el.classList.remove("fade-out");
+            el.classList.add("fade-in");
+
+            setTimeout(() => {
+                el.classList.remove("fade-in");
+            }, 300);
+
+        }, 300);
+    }
+
+
+    // === ЛОГИКА ===
+    counter.addEventListener("click", () => {
+        state.count++;
+
+        if (state.count === 1) {
+            counter.classList.remove("pulse");
+        }
+
+        if (state.count >= state.limit) {
+            state.count = 0;
+            state.cycles++;
+            state.index = (state.index + 1) % zikrList.length;
+            playClick(1000, 100);
+            updateZikrTextAnimated();
+            // Анимация возвращается в начале каждого цикла
+            counter.classList.add("pulse");
+        }
+
+        updateUI();
+        saveState();
+    });
+
+    // Смена zikr
+    zikrSelect.addEventListener("change", (e) => {
+        state.index = +e.target.value;
+        saveState();
+        updateUI();
+    });
+
+    // Смена лимита
+    limitSelect.addEventListener("change", (e) => {
+        state.limit = +e.target.value;
+        saveState();
+        updateUI();
+    });
+
+    // reset
+    document.getElementById("reset").addEventListener("click", () => {
+        state = { count: 0, limit: 33, cycles: 0, index: 0 };
+
+        counter.classList.add("pulse"); // Возвращает анимацию
+
+        saveState();
+        updateUI();
+    });
+
+   
+    
+    // Запуск
+    loadState();
+    updateUI();
+</script>
+</body>
+</html>

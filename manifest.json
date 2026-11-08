@@ -1,0 +1,20 @@
+{
+  "name": "Tasbeh",
+  "short_name": "Tasbeh",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fefce8",
+  "theme_color": "#4CAF50",
+  "icons": [
+  {
+    "src": "Tasbeh-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "Tasbeh-512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+  ]
+}
