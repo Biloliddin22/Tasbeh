@@ -25,6 +25,7 @@
   --active-row: #edf7e7;
   --active-line: #89b98b;
   --check-line: #6b7c60;
+  --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 5.5 5 5 5-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 :root[data-theme="dark"] {
@@ -317,7 +318,7 @@ h1 {
   height: var(--arrow-size);
   pointer-events: none;
   background: currentColor;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 5.5 5 5 5-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: var(--chevron-mask) center / contain no-repeat;
   translate: 0 -50%;
   rotate: 0deg;
   transition: rotate .22s ease-in-out;
@@ -719,6 +720,8 @@ h1 {
   overscroll-behavior: contain;
 }
 
+#guidePage { scrollbar-gutter: stable both-edges; }
+
 .info-shell {
   display: flex;
   flex-direction: column;
@@ -798,39 +801,56 @@ h1 {
   gap: 8px;
 }
 
-.guide-topic { padding: 0; }
-.guide-topic:not([open]) { border-radius: 999px; }
+.guide-topic {
+  /* Keep the radius below half the minimum header height, even when fully collapsed. */
+  --guide-corner: 26px;
+  padding: 0;
+  border-radius: var(--guide-corner);
+  overflow: clip;
+}
 
-.guide-topic summary {
+.guide-topic > summary {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 52px;
+  min-height: calc(2 * var(--guide-corner));
   padding: 8px clamp(12px, 3.6vw, 24px);
-  border-radius: 999px;
   font-weight: 700;
   list-style: none;
   cursor: pointer;
 }
 
-.guide-topic summary::-webkit-details-marker { display: none; }
+.guide-topic > summary::-webkit-details-marker { display: none; }
 @media (hover: hover) {
-  .guide-topic:not([open]):has(> summary:hover) { background: var(--surface-hover); }
-  .guide-topic[open] > summary:hover { background: var(--surface-hover); }
+  .guide-topic > summary:hover { background: var(--surface-hover); }
 }
 
-.guide-topic summary::after {
+.guide-topic > summary:focus-visible {
+  outline: none;
+}
+
+.guide-topic > summary:focus-visible::before {
   content: "";
-  width: 8px;
-  height: 8px;
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--focus);
+  border-radius: calc(var(--guide-corner) - 4px);
+  pointer-events: none;
+}
+
+.guide-topic > summary::after {
+  content: "";
+  width: 16px;
+  height: 16px;
   flex: none;
   margin-inline-start: auto;
-  border: solid currentColor;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  background: currentColor;
+  mask: var(--chevron-mask) center / contain no-repeat;
+  transform: rotate(0deg);
 }
 
-.guide-topic[open] summary::after { transform: rotate(225deg); }
+.guide-topic[open] > summary::after { transform: rotate(180deg); }
 .guide-topic-content { padding: 4px clamp(12px, 3.6vw, 24px) 18px; }
 
 .habit-zikr {
@@ -853,7 +873,8 @@ h1 {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .guide-topic summary::after { transition: transform .28s ease; }
+  .guide-topic > summary { transition: background-color .16s ease; }
+  .guide-topic > summary::after { transition: transform .28s ease; }
 
   @supports (interpolate-size: allow-keywords) and selector(::details-content) {
     .guide-topic { interpolate-size: allow-keywords; }
