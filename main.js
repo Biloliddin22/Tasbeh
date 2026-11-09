@@ -521,6 +521,12 @@ guideDemo.addEventListener("click", () => {
   demoAnimation = animateNumber(guideDemoCount, demoAnimation);
 });
 
+document.getElementById("guidePage").addEventListener("close", event => {
+  const guide = event.currentTarget;
+  guide.querySelectorAll(".guide-topic[open]").forEach(topic => { topic.open = false; });
+  guide.scrollTop = 0;
+});
+
 optionsMenu.addEventListener("keydown", event => {
   if (event.key !== "Escape" || !optionsMenu.open) return;
   optionsMenu.open = false;
@@ -591,8 +597,28 @@ if (!refreshDaily()) render();
 document.addEventListener("tasbeh:ready", showWelcome, { once: true });
 scheduleDailyRefresh();
 
+async function setupAppUpdates() {
+  const registration = await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+  let lastCheck = -Infinity;
+  function checkForUpdate() {
+    if (document.hidden || !navigator.onLine || !registration.active) return;
+    const now = Date.now();
+    if (now - lastCheck < 30_000) return;
+    lastCheck = now;
+    // The browser keeps the open pages on their current shell until they close.
+    registration.update().catch(() => {});
+  }
+
+  document.addEventListener("visibilitychange", checkForUpdate);
+  window.addEventListener("online", () => {
+    lastCheck = -Infinity;
+    checkForUpdate();
+  });
+  checkForUpdate();
+}
+
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("sw.js").catch(error => {
+  setupAppUpdates().catch(error => {
     console.warn("Tasbeh service worker could not register", error);
   });
 }

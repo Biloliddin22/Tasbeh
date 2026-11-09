@@ -258,72 +258,94 @@
           <h3 data-i18n="guideHeadline"></h3>
           <p data-i18n="guideIntro"></p>
         </section>
-        <div class="guide-grid">
-          <section class="info-card">
-            <h3><span class="guide-icon" aria-hidden="true">↻</span><span data-i18n="freestyle">Freestyle</span></h3>
-            <ol class="guide-steps">
-              <li data-i18n="freeStep1"></li>
-              <li data-i18n="freeStep2"></li>
-              <li data-i18n="freeStep3" data-menu-example></li>
-            </ol>
-            <button class="guide-demo" id="guideDemo" type="button">
-              <strong id="guideDemoCount">0</strong>
-              <span>/ 5</span>
-              <span data-i18n="tryDemo"></span>
-            </button>
-          </section>
-          <section class="info-card">
-            <h3><span class="guide-icon" aria-hidden="true">✓</span><span data-i18n="daily">Daily</span></h3>
-            <ol class="guide-steps">
-              <li data-i18n="dailyStep1"></li>
-              <li data-i18n="dailyStep2"></li>
-            </ol>
-            <div class="daily-stats guide-stats" aria-hidden="true">
-              <div class="stat today"><span data-i18n="today">Today</span><strong>3 / 5</strong></div>
-              <div class="stat total"><span data-i18n="total">Total</span><strong>12</strong></div>
+        <div class="guide-topics">
+          <details class="info-card guide-topic" name="guide-topic">
+            <summary><span class="guide-icon" aria-hidden="true">✦</span><span id="habitGuideTitle" data-i18n="habitTitle"></span></summary>
+            <div class="guide-topic-content">
+              <p data-i18n="habitCommute"></p>
+              <p data-i18n="habitPractice"></p>
+              <p data-i18n="habitMeaning"></p>
+              <p><strong data-i18n="habitExampleTitle"></strong><br>
+                <span data-i18n="habitHeartbeat"></span> <strong class="habit-zikr" data-i18n="habitZikr"></strong><span data-i18n="habitHeartbeatEnd"></span>
+              </p>
+              <p><span data-i18n="habitExample"></span> <strong class="habit-zikr" data-i18n="habitZikr"></strong><span data-i18n="habitExampleEnd"></span></p>
+              <blockquote class="habit-reflection" data-i18n="habitReflection"></blockquote>
+              <p class="guide-note" data-i18n="habitPrayer"></p>
             </div>
-            <p class="guide-note" data-i18n="statsNote"></p>
-          </section>
+          </details>
+          <details class="info-card guide-topic" name="guide-topic">
+            <summary><span class="guide-icon" aria-hidden="true">↻</span><span data-i18n="freestyleGuide">About Freestyle mode</span></summary>
+            <div class="guide-topic-content">
+              <ol class="guide-steps">
+                <li data-i18n="freeStep1"></li>
+                <li data-i18n="freeStep2"></li>
+                <li data-i18n="freeStep3" data-menu-example></li>
+              </ol>
+              <button class="guide-demo" id="guideDemo" type="button">
+                <strong id="guideDemoCount">0</strong>
+                <span>/ 5</span>
+                <span data-i18n="tryDemo"></span>
+              </button>
+            </div>
+          </details>
+          <details class="info-card guide-topic" name="guide-topic">
+            <summary><span class="guide-icon" aria-hidden="true">✓</span><span data-i18n="dailyGuide">About Daily mode</span></summary>
+            <div class="guide-topic-content">
+              <ol class="guide-steps">
+                <li data-i18n="dailyStep1"></li>
+                <li data-i18n="dailyStep2"></li>
+              </ol>
+              <div class="daily-stats guide-stats" aria-hidden="true">
+                <div class="stat today"><span data-i18n="today">Today</span><strong>3 / 5</strong></div>
+                <div class="stat total"><span data-i18n="total">Total</span><strong>12</strong></div>
+              </div>
+              <p class="guide-note" data-i18n="statsNote"></p>
+            </div>
+          </details>
+          <details class="info-card guide-topic" name="guide-topic">
+            <summary><span class="guide-icon" aria-hidden="true">↓</span><span id="installGuideTitle" data-i18n="installTitle"></span></summary>
+            <div class="guide-topic-content">
+              <ol class="guide-steps install-steps">
+                <li>
+                  <p data-i18n="installStep1"></p>
+                  <div class="install-shot">
+                    <img src="install-guide/chrome-menu.webp" width="680" height="108" loading="lazy" alt="">
+                    <svg viewBox="0 0 922 146" preserveAspectRatio="none" aria-hidden="true">
+                      <path d="m771 114 66-36m-26 0h26l-13 23"/>
+                      <circle cx="866" cy="64" r="26"/>
+                    </svg>
+                  </div>
+                </li>
+                <li>
+                  <p data-i18n="installStep2"></p>
+                  <div class="install-shot">
+                    <img src="install-guide/install-option.webp" width="680" height="310" loading="lazy" alt="">
+                    <svg viewBox="0 0 844 385" preserveAspectRatio="none" aria-hidden="true">
+                      <path d="m771 220-132 66m30 0h-30l16-25"/>
+                    </svg>
+                  </div>
+                </li>
+                <li>
+                  <p data-i18n="installStep3"></p>
+                  <div class="install-shot">
+                    <img src="install-guide/confirm-install.webp" width="680" height="385" loading="lazy" alt="">
+                    <svg viewBox="0 0 922 522" preserveAspectRatio="none" aria-hidden="true">
+                      <path d="m686 219-237 39m30 10-30-10 25-19"/>
+                    </svg>
+                  </div>
+                </li>
+              </ol>
+              <p class="guide-note" data-i18n="installOfflineNote"></p>
+            </div>
+          </details>
+          <details class="info-card guide-topic" name="guide-topic">
+            <summary><span class="guide-icon" aria-hidden="true">i</span><span data-i18n="goodToKnow"></span></summary>
+            <div class="guide-topic-content">
+              <p data-i18n="savedNote"></p>
+              <p data-i18n="settingsNote" data-menu-example></p>
+            </div>
+          </details>
         </div>
-        <section class="info-card" aria-labelledby="installGuideTitle">
-          <h3 id="installGuideTitle" data-i18n="installTitle"></h3>
-          <ol class="guide-steps install-steps">
-            <li>
-              <p data-i18n="installStep1"></p>
-              <div class="install-shot">
-                <img src="install-guide/chrome-menu.webp" width="680" height="108" loading="lazy" alt="">
-                <svg viewBox="0 0 922 146" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="m771 114 66-36m-26 0h26l-13 23"/>
-                  <circle cx="866" cy="64" r="26"/>
-                </svg>
-              </div>
-            </li>
-            <li>
-              <p data-i18n="installStep2"></p>
-              <div class="install-shot">
-                <img src="install-guide/install-option.webp" width="680" height="310" loading="lazy" alt="">
-                <svg viewBox="0 0 844 385" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="m771 220-132 66m30 0h-30l16-25"/>
-                </svg>
-              </div>
-            </li>
-            <li>
-              <p data-i18n="installStep3"></p>
-              <div class="install-shot">
-                <img src="install-guide/confirm-install.webp" width="680" height="385" loading="lazy" alt="">
-                <svg viewBox="0 0 922 522" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="m686 219-237 39m30 10-30-10 25-19"/>
-                </svg>
-              </div>
-            </li>
-          </ol>
-          <p class="guide-note" data-i18n="installOfflineNote"></p>
-        </section>
-        <section class="info-card guide-extra">
-          <h3 data-i18n="goodToKnow"></h3>
-          <p data-i18n="savedNote"></p>
-          <p data-i18n="settingsNote" data-menu-example></p>
-        </section>
       </div>
     </div>
   </dialog>

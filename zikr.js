@@ -127,7 +127,16 @@ const zikrList = [
         full: "Bismillahir rohmanir rohiym. Qul aʼuzu birobbinnaas. Malikin naas. Ilaahin naas. Min sharril vasvaasil xonnaas. Allaziy yuvasvisu fiy suduurin naas. Minal jinnati vannaas.",
     },
     { text: "Laa ilaha illa anta subhanaka inni kuntu minaz-zalimiyn" },
-    { text: "Allohumma solli 'ala Muhammadin va 'ala ali Muhammad" },
+    { text: "Alloohumma solli 'alaa Muhammadin va 'alaa aali Muhammad" },
+    { text: "Alloohumma barik 'alaa Muhammadin va 'alaa aali Muhammad" },
+    {
+        text: "Kavsar surasi",
+        full: "Bismillahir Rohmanir Rohiym. Innaa aʼtoynaakal kavsar. Fasolli li Robbika vanhar. Inna shaani-aka huval abtar.",
+    },
+    {
+        text: "Asr surasi",
+        full: "Bismillahir Rohmanir Rohiym. Val ʼasr. Innal insaana lafii xusr. Illallaziina aamanuu va ʼamilus soolihaati va tavaasov bilhaqqi va tavaasov bissobr.",
+    },
 ];
 
 const nameIndices = [];

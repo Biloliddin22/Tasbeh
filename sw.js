@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "tasbeh-shell-";
 // Bump this version whenever a file in SHELL_FILES changes.
-const CACHE_VERSION = 4;
+const CACHE_VERSION = 13;
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const SHELL_FILES = [
   "./",
@@ -27,7 +27,7 @@ self.addEventListener("install", event => {
     const cache = await caches.open(CACHE_NAME);
     // Cache the launch URL directly. Cloudflare Pages redirects the /index.html alias.
     await cache.addAll([...shellURLs].map(url => new Request(url, { cache: "reload", redirect: "error" })));
-    // Replace the broken v2 worker even if a recovery tab is still open.
+    // Recover the broken v2 shell immediately; normal updates wait for open app windows to close.
     if (await caches.has(CACHE_PREFIX + "2")) await self.skipWaiting();
   })());
 });
