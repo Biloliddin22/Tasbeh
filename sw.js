@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "tasbeh-shell-";
 // Bump this version whenever a file in SHELL_FILES changes.
-const CACHE_VERSION = 15;
+const CACHE_VERSION = 19;
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 const SHELL_FILES = [
   "./",

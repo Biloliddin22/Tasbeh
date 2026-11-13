@@ -52,6 +52,7 @@ let menuRows = [];
 let textAnimation;
 let countAnimation;
 let demoAnimation;
+let resetAnimation;
 let demoTaps = 0;
 let greetingTimer;
 let visibleWish;
@@ -303,8 +304,21 @@ function setZikrText(text) {
     textAnimation = zikrText.animate([
       { opacity: 0, transform: "translateY(18px)" },
       { opacity: 1, transform: "translateY(0)" },
-    ], { duration: 400, easing: "ease-out" });
+    ], { duration: 400, easing: "cubic-bezier(.22, 1, .36, 1)" });
   }
+}
+
+function setStatistic(element, value, animate = true) {
+  const text = String(value);
+  if (element.textContent === text) return;
+  const previous = element.textContent;
+  element.textContent = text;
+  element.getAnimations().forEach(animation => animation.cancel());
+  if (!previous || !animate || reduceMotion.matches) return;
+  element.animate([
+    { opacity: .5, transform: "translateY(4px)" },
+    { opacity: 1, transform: "translateY(0)" },
+  ], { duration: 220, easing: "cubic-bezier(.22, 1, .36, 1)" });
 }
 
 function animateNumber(element, animation) {
@@ -335,8 +349,7 @@ function renderDailyMenu(active, completed) {
         daily.active = position;
         saveDaily();
         render();
-        dailyMenu.close();
-        counter.focus();
+        closeAnimatedDialog(dailyMenu).then(() => counter.focus());
       });
 
       const label = document.createElement("label");
@@ -357,8 +370,8 @@ function renderDailyMenu(active, completed) {
     dailyList.replaceChildren(...menuRows.map(entry => entry.row));
   }
 
-  dailyToday.textContent = `${completed} / ${dailySize}`;
-  dailyTotal.textContent = daily.previousTotal + completed;
+  setStatistic(dailyToday, `${completed} / ${dailySize}`, dailyMenu.open);
+  setStatistic(dailyTotal, daily.previousTotal + completed, dailyMenu.open);
   const text = messages();
   daily.items.forEach((item, position) => {
     const { row, select, progress, check } = menuRows[position];
@@ -391,7 +404,7 @@ function render() {
     const active = activeDailyIndex();
     current = daily.items[active];
     completed = completedItems(daily);
-    dailyPreview.textContent = `${completed} / ${dailySize}`;
+    setStatistic(dailyPreview, `${completed} / ${dailySize}`);
     if (dailyMenu.open) renderDailyMenu(active, completed);
   } else {
     zikrSelect.value = freestyle.index;
@@ -403,8 +416,8 @@ function render() {
   zikrText.classList.toggle("long-zikr", Boolean(zikr?.full));
   setZikrText(zikr ? (zikr.full || zikr.text) : text.complete);
   count.textContent = current ? current.count : "✓";
-  counterLimit.textContent = current ? `/ ${current.limit}` : "/ —";
-  cycles.textContent = `× ${completed}`;
+  setStatistic(counterLimit, current ? `/ ${current.limit}` : "/ —");
+  setStatistic(cycles, `× ${completed}`);
   counter.classList.toggle("pulse", current?.count === 0);
   counter.disabled = !current;
   reset.disabled = !current;
@@ -474,6 +487,13 @@ reset.addEventListener("click", () => {
     save(freestyleKey, freestyle);
   }
   render();
+  resetAnimation?.cancel();
+  if (!reduceMotion.matches) {
+    resetAnimation = reset.querySelector("svg").animate([
+      { transform: "rotate(0deg)" },
+      { transform: "rotate(-180deg)" },
+    ], { duration: 320, easing: "cubic-bezier(.22, 1, .36, 1)" });
+  }
 });
 
 resetCycles.addEventListener("click", () => {
@@ -521,8 +541,11 @@ guideDemo.addEventListener("click", () => {
   demoAnimation = animateNumber(guideDemoCount, demoAnimation);
 });
 
-document.getElementById("guidePage").addEventListener("close", event => {
+document.getElementById("guidePage").addEventListener("close", async event => {
   const guide = event.currentTarget;
+  // Preserve the visible content while the page is sliding out.
+  await Promise.allSettled(guide.getAnimations().map(animation => animation.finished));
+  if (guide.open) return;
   guide.querySelectorAll(".guide-topic[open]").forEach(topic => { topic.open = false; });
   guide.scrollTop = 0;
 });
@@ -538,10 +561,34 @@ document.addEventListener("click", event => {
 });
 
 function showDailyMenu() {
+  dailyMenu.removeAttribute("data-closing");
   if (dailyMenu.open) return;
   renderDailyMenu(activeDailyIndex(), completedItems(daily));
   dailyMenu.showModal();
 }
+
+async function closeAnimatedDialog(dialog) {
+  if (!dialog.open) return;
+  // Browsers without top-layer transitions keep the modal open during the fade.
+  if (!CSS.supports("overlay", "auto")) {
+    dialog.setAttribute("data-closing", "");
+    await Promise.allSettled(dialog.getAnimations().map(animation => animation.finished));
+    if (!dialog.hasAttribute("data-closing")) return;
+  }
+  dialog.close();
+  dialog.removeAttribute("data-closing");
+}
+
+document.querySelectorAll("#dailyMenu, .info-page").forEach(dialog => {
+  dialog.addEventListener("cancel", event => {
+    event.preventDefault();
+    closeAnimatedDialog(dialog);
+  });
+  dialog.querySelector('form[method="dialog"]').addEventListener("submit", event => {
+    event.preventDefault();
+    closeAnimatedDialog(dialog);
+  });
+});
 
 dailyMode.addEventListener("click", () => {
   mode = "daily";
@@ -585,7 +632,7 @@ window.addEventListener("storage", event => {
   if (event.key === freestyleKey || event.key === null) freestyle = loadFreestyle();
   if (event.key === dailyKey || event.key === null) {
     ({ mode, daily, draws } = loadDaily());
-    if (mode === "freestyle" && dailyMenu.open) dailyMenu.close();
+    if (mode === "freestyle" && dailyMenu.open) closeAnimatedDialog(dailyMenu);
     if (mode === "daily" && ensureDaily()) saveDaily();
   }
   render();

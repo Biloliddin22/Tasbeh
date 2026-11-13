@@ -137,6 +137,28 @@ const zikrList = [
         text: "Asr surasi",
         full: "Bismillahir Rohmanir Rohiym. Val ʼasr. Innal insaana lafii xusr. Illallaziina aamanuu va ʼamilus soolihaati va tavaasov bilhaqqi va tavaasov bissobr.",
     },
+    { text: "Hasbinallohi va ni'mal vakil" },
+    { text: "Ya Boqiy antal Boqiy" },
+    {
+        text: "Quraysh surasi",
+        full: "Bismillahir Rohmanir Rohiym. Li iylaafi quroysh. Iylaafihim rihlatash shitaa`i vas soyf. Fal yaʼbuduu Robba haazal bayt. Allaziy atʼamahum min juuʼiv va aamanahum min xovf.",
+    },
+    {
+        text: "Ma'un surasi",
+        full: "Bismillahir Rohmanir Rohiym. Aroaytallaziy yukazzibu bid diin. Fa zaalikallazii yaduʼul yatiim. Va laa yahuzzu ʼalaa toʼaamil miskiin. Fa vaylul lil musolliin. Allaziyna hum ʼan solaatihim saahuun. Allaziyna hum yuroouun. Va yamnaʼuunal maaʼuun.",
+    },
+    {
+        text: "Kafirun surasi",
+        full: "Bismillahir Rohmanir Rohiym. Qul yaa ayyuhal kaafiruun. Laa aʼbudu maa taʼbuduun. Va laa antum ʼaabiduuna maa aʼbud. Va laa ana ʼaabidum maa ʼabadtum. Va laa antum ʼaabiduuna maa aʼbud. Lakum diinukum valiya diin.",
+    },
+    {
+        text: "Masad surasi",
+        full: "Bismillahir Rohmanir Rohiym. Tabbat yadaa abii lahabiv va tabb. Maa ag‘naa ʼanhu maaluhuu va maa kasab. Sayaslaa naaron zaata lahabiv. Vamroatuhuu hammalatal hatob. Fii jiidihaa hablum mim masad.",
+    },
+    {
+        text: "Nasr surasi",
+        full: "Bismillahir Rohmanir Rohiym. Izaa jaa`a nasrulloohi val fath. Va roaytan naasa yadxuluuna fii diinillaahi afvaajaa. Fasabbih bihamdi Robbika vastag‘firhu, innahuu kaana tavvaaba.",
+    },
 ];
 
 const nameIndices = [];

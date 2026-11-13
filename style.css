@@ -25,6 +25,8 @@
   --active-row: #edf7e7;
   --active-line: #89b98b;
   --check-line: #6b7c60;
+  --motion-settle: cubic-bezier(.22, 1, .36, 1);
+  --motion-switch: cubic-bezier(.22, 1.12, .36, 1);
   --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 5.5 5 5 5-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
@@ -130,12 +132,12 @@ h1 {
   position: absolute;
   z-index: -1;
   inset-block: var(--switch-inset);
-  inset-inline-start: calc(var(--switch-inset) + var(--active-segment) * (var(--segment-width) + var(--switch-gap)));
+  inset-inline-start: var(--switch-inset);
   inline-size: var(--segment-width);
   border-radius: inherit;
   background: var(--paper);
   box-shadow: 0 1px 3px #203c151a;
-  transition: inset-inline-start .24s ease-in-out;
+  transform: translateX(calc(var(--active-segment) * (100% + var(--switch-gap))));
 }
 
 .mode-switch:has(#dailyMode[aria-pressed="true"]) {
@@ -181,6 +183,7 @@ h1 {
   border-radius: 14px;
   background: var(--paper);
   box-shadow: 0 6px 18px #203c1522;
+  transform-origin: top right;
 }
 
 .options-quick {
@@ -236,7 +239,9 @@ h1 {
   white-space: nowrap;
 }
 
-#themeToggle:hover, #resetCycles:hover, .options-link:hover { background: var(--surface-hover); }
+@media (hover: hover) {
+  #themeToggle:hover, #resetCycles:hover, .options-link:hover { background: var(--surface-hover); }
+}
 
 #themeToggle {
   display: grid;
@@ -481,12 +486,18 @@ h1 {
   color: inherit;
   font-variant-numeric: tabular-nums;
   user-select: none;
-  transition: background-color .15s ease, transform .12s ease;
+  transition: background-color .15s ease;
 }
 
 #counter:active:not(:disabled) {
-  transform: scale(.988);
   background: var(--green-dark);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .counter-panel { transition: transform .12s ease; }
+  .counter-panel:has(#counter:active:not(:disabled), #reset:active:not(:disabled)) {
+    transform: scale(.988);
+  }
 }
 
 #counter:disabled { background: var(--green-dark); }
@@ -536,7 +547,10 @@ h1 {
   color: inherit;
 }
 
-#reset:enabled:hover, #reset:enabled:active { background: #ffffff25; }
+#reset:enabled:active { background: #ffffff25; }
+@media (hover: hover) {
+  #reset:enabled:hover { background: #ffffff25; }
+}
 #reset:disabled { opacity: .5; }
 #reset:focus-visible { outline-color: white; }
 #reset svg { width: 21px; height: 21px; }
@@ -560,6 +574,79 @@ h1 {
 }
 
 #dailyMenu::backdrop { background: var(--backdrop); }
+
+/* Keep the dialog in the top layer until its exit transition finishes. */
+:is(#dailyMenu, .info-page) {
+  opacity: 0;
+  transition: opacity .18s ease-out, transform .28s var(--motion-settle), display .28s, overlay .28s;
+  transition-behavior: allow-discrete;
+}
+
+:is(#dailyMenu, .info-page)[open]:not([data-closing]) { opacity: 1; }
+
+:is(#dailyMenu, .info-page)::backdrop {
+  opacity: 0;
+  transition: opacity .18s ease-out, display .28s, overlay .28s;
+  transition-behavior: allow-discrete;
+}
+
+:is(#dailyMenu, .info-page)[open]:not([data-closing])::backdrop { opacity: 1; }
+
+@starting-style {
+  :is(#dailyMenu, .info-page)[open]:not([data-closing]),
+  :is(#dailyMenu, .info-page)[open]:not([data-closing])::backdrop { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .segmented::before { transition: transform .32s var(--motion-switch); }
+  .segmented button { transition: color .18s ease-out, transform .12s ease-out; }
+  .segmented button:active { transform: scale(.96); }
+
+  #optionsToggle { transition: transform .16s var(--motion-settle); }
+  #optionsToggle:active { transform: scale(.94); }
+
+  /* The wrapper postpones hiding while the panel fades, without animating layout. */
+  @supports selector(::details-content) {
+    #optionsMenu::details-content {
+      transition: content-visibility .22s;
+      transition-behavior: allow-discrete;
+    }
+
+    .options-panel {
+      opacity: 0;
+      transform: translateY(-6px) scale(.97);
+      transition: opacity .18s ease-out, transform .22s var(--motion-settle);
+    }
+
+    #optionsMenu[open] .options-panel {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    @starting-style {
+      #optionsMenu[open] .options-panel {
+        opacity: 0;
+        transform: translateY(-6px) scale(.97);
+      }
+    }
+  }
+
+  #dailyMenu {
+    transform: translateY(18px) scale(.985);
+    transition: opacity .18s ease-out, transform .28s var(--motion-settle), display .28s, overlay .28s;
+    transition-behavior: allow-discrete;
+  }
+
+  #dailyMenu[open]:not([data-closing]) { transform: translateY(0) scale(1); }
+
+  @starting-style {
+    #dailyMenu[open]:not([data-closing]) { transform: translateY(18px) scale(.985); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(#dailyMenu, .info-page), :is(#dailyMenu, .info-page)::backdrop { transition-duration: .1s; }
+}
 
 .dialog-header {
   display: flex;
@@ -660,6 +747,8 @@ h1 {
 
 .daily-check input {
   appearance: none;
+  display: grid;
+  place-items: center;
   width: 20px;
   height: 20px;
   margin: 0;
@@ -671,9 +760,19 @@ h1 {
 
 .daily-check input:checked {
   border-color: var(--green);
-  background: var(--green) center / 14px no-repeat
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3.5 8 3 3 6-6' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background: var(--green);
 }
+
+.daily-check input::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: white;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3.5 8 3 3 6-6' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0;
+}
+
+.daily-check input:checked::before { opacity: 1; }
 
 .greeting-region {
   position: fixed;
@@ -695,7 +794,7 @@ h1 {
   color: var(--ink);
   line-height: 1.4;
   text-align: center;
-  animation: greet 4.2s ease both;
+  animation: greet 4.2s var(--motion-settle) both;
 }
 
 .session-welcome { animation-duration: 2.6s; }
@@ -761,7 +860,9 @@ h1 {
 
 .back-button svg { width: 17px; height: 17px; flex: none; }
 
-.back-button:hover { background: var(--surface-hover); }
+@media (hover: hover) {
+  .back-button:hover { background: var(--surface-hover); }
+}
 
 .info-content {
   --paragraph-gap: 16px;
@@ -874,7 +975,7 @@ h1 {
 
 @media (prefers-reduced-motion: no-preference) {
   .guide-topic > summary { transition: background-color .16s ease; }
-  .guide-topic > summary::after { transition: transform .28s ease; }
+  .guide-topic > summary::after { transition: transform .28s var(--motion-settle); }
 
   @supports (interpolate-size: allow-keywords) and selector(::details-content) {
     .guide-topic { interpolate-size: allow-keywords; }
@@ -882,7 +983,9 @@ h1 {
     .guide-topic::details-content {
       height: 0;
       overflow: clip;
-      transition: height .28s ease, content-visibility .28s allow-discrete;
+      contain: layout;
+      transition: height .28s var(--motion-settle), content-visibility .28s;
+      transition-behavior: allow-discrete;
     }
 
     .guide-topic[open]::details-content { height: auto; }
@@ -1048,6 +1151,66 @@ h1 {
 
 @media (forced-colors: active) {
   .daily-check input { appearance: auto; }
+  .daily-check input::before { content: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(#reset, .close-menu, .back-button, .options-link, #resetCycles, #themeToggle, .contact-link) {
+    transition: transform .16s var(--motion-settle), background-color .18s ease-out, color .18s ease-out;
+  }
+
+  :is(#reset, .close-menu, .back-button, .options-link, #resetCycles, #themeToggle, .contact-link):active:not(:disabled) {
+    transform: scale(.96);
+  }
+
+  .select-field::after { transition: rotate .26s var(--motion-settle); }
+  .daily-open { transition: transform .16s var(--motion-settle), background-color .18s ease-out; }
+  .daily-open:active { transform: scale(.99); }
+  .daily-open::after { transition: transform .26s var(--motion-settle); }
+  .app:has(~ #dailyMenu[open]:not([data-closing])) .daily-open::after {
+    transform: translateY(2px) rotate(225deg);
+  }
+
+  .controls:not([hidden]), .daily-open:not([hidden]) { animation: controls-reveal .24s var(--motion-settle); }
+
+  @keyframes controls-reveal {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .daily-item, .daily-check input { transition: background-color .18s ease-out, border-color .18s ease-out; }
+  .daily-item button { transition: transform .16s var(--motion-settle); }
+  .daily-item button:active:not(:disabled) { transform: translateX(2px); }
+  .daily-check input::before {
+    transform: scale(.65);
+    transition: opacity .16s ease-out, transform .22s var(--motion-switch);
+  }
+  .daily-check input:checked::before { transform: scale(1); }
+
+  .info-page {
+    transform: translateX(16px);
+  }
+
+  .info-page[open]:not([data-closing]) { transform: translateX(0); }
+
+  @starting-style {
+    .info-page[open]:not([data-closing]) { transform: translateX(16px); }
+  }
+
+  @supports (appearance: base-select) and selector(::picker(select)) {
+    .select-field select::picker(select) {
+      opacity: 0;
+      transform: translateY(-5px);
+      transition: opacity .16s ease-out, transform .22s var(--motion-settle), display .22s, overlay .22s;
+      transition-behavior: allow-discrete;
+    }
+
+    .select-field select:open::picker(select) { opacity: 1; transform: translateY(0); }
+
+    @starting-style {
+      .select-field select:open::picker(select) { opacity: 0; transform: translateY(-5px); }
+    }
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1058,15 +1221,27 @@ h1 {
     .stat, .daily-item, .daily-check input, .greeting, #dailyPreview, .daily-item button span,
     .select-field > span
   ) {
-    transition: background-color .32s ease, color .32s ease, border-color .32s ease;
+    transition: background-color .32s ease, color .32s ease, border-color .32s ease,
+      transform .16s var(--motion-settle);
   }
 
   .theme-transition .segmented::before {
-    transition: inset-inline-start .24s ease-in-out, background-color .32s ease;
+    transition: transform .32s var(--motion-switch), background-color .32s ease;
+  }
+
+  .theme-transition #optionsMenu .options-panel {
+    transition: opacity .18s ease-out, transform .22s var(--motion-settle),
+      background-color .32s ease, color .32s ease, border-color .32s ease;
+  }
+
+  .theme-transition #dailyMenu {
+    transition: opacity .18s ease-out, transform .28s var(--motion-settle), display .28s, overlay .28s,
+      background-color .32s ease, color .32s ease, border-color .32s ease;
+    transition-behavior: allow-discrete;
   }
 
   .theme-transition #counter {
-    transition: background-color .32s ease, transform .12s ease;
+    transition: background-color .32s ease;
   }
 
   .theme-transition #themeToggle svg {
